@@ -48,13 +48,10 @@
 		</dependency>
 
 		<dependency>
-<groupId>gpsUtil</groupId>
-<artifactId>gpsUtil</artifactId>
-<version>1.0.0</version>
-
-</dependency>
-
-
+			<groupId>gpsUtil</groupId>
+			<artifactId>gpsUtil</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>tripPricer</groupId>

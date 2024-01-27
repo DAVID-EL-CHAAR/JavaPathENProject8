@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
@@ -69,11 +70,22 @@ public class User {
 		visitedLocations.clear();
 	}
 	
-	public void addUserReward(UserReward userReward) {
+  	/*public void addUserReward(UserReward userReward) {
 		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
 			userRewards.add(userReward);
 		}
+	}*/
+	
+	public void addUserReward(UserReward userReward) {
+		if(userRewards.stream().noneMatch(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName))) {
+	    userRewards.add(userReward);
 	}
+	}
+
+	
+	
+
+
 	
 	public List<UserReward> getUserRewards() {
 		return userRewards;
