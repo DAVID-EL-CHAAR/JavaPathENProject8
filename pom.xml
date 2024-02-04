@@ -6,6 +6,9 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.1.1</version>
+		<configuration>
+                  <mainClass>com.openclassrooms.tourguide.TourguideApplication.java</mainClass>
+                </configuration>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.openclassrooms</groupId>
