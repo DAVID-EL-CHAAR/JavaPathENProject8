@@ -26,7 +26,7 @@ jobs:
           mvn install:install-file -Dfile=TourGuide/libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
           
       - name: Build with Maven
-        run: mvn -B clean install # L'option -B est pour le mode batch (non interactif)
+        run: mvn clean install # L'option -B est pour le mode batch (non interactif)
       
       - name: Upload JAR
         uses: actions/upload-artifact@v2
