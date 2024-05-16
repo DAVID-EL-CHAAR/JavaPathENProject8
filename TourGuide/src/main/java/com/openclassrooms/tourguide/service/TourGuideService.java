@@ -6,7 +6,8 @@ import com.openclassrooms.tourguide.model.AttractionInformationDto;
 import com.openclassrooms.tourguide.tracker.Tracker;
 import com.openclassrooms.tourguide.user.User;
 import com.openclassrooms.tourguide.user.UserReward;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -32,7 +34,7 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
-
+import jakarta.annotation.PreDestroy;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
@@ -44,6 +46,12 @@ public class TourGuideService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
+	private ExecutorService executorService = Executors.newFixedThreadPool(20);
+
+	@PreDestroy
+	public void shutdownExecutorService() {
+		executorService.shutdown();
+	}
 	
     
 
@@ -131,11 +139,111 @@ public class TourGuideService {
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
-		rewardsService.calculateRewards(user);
+		rewardsService.calculateRewardss(user);
 		return visitedLocation;
 	}
-
 	
+	public CompletableFuture<Void> trackUserLocationAsync(User user) {
+	    return CompletableFuture.runAsync(() -> trackUserLocation(user), executorService);
+	}
+
+
+
+	/*
+	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
+		List<Attraction> nearbyAttractions = new ArrayList<>();
+		for (Attraction attraction : gpsUtil.getAttractions()) {
+			if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
+				nearbyAttractions.add(attraction);
+			}
+		}
+
+		return nearbyAttractions;
+	} */
+	
+/*	public List<AttractionInformationDto> getNearByAttractions(VisitedLocation visitedLocation) {
+	    User user = getUserByUserId(visitedLocation.userId); // Récupère l'utilisateur par son UUID
+	    if (user == null) {
+	        // Gérer le cas où aucun utilisateur n'est trouvé
+	        return Collections.emptyList();
+	    }
+
+	    List<Attraction> allAttractions = gpsUtil.getAttractions();
+	    return allAttractions.stream()
+	        .map(attraction -> new AttractionInformationDto(
+	            attraction.attractionName,
+	            attraction.latitude,
+	            attraction.longitude,
+	            visitedLocation.location.latitude,
+	            visitedLocation.location.longitude,
+	            rewardsService.getDistance(attraction, visitedLocation.location),
+	            rewardsService.getRewardPoints(attraction, user))) // Utiliser l'objet User ici
+	        .sorted(Comparator.comparingDouble(AttractionInformationDto::getDistance))
+	        .limit(5)
+	        .collect(Collectors.toList());
+	} */
+	
+/*	public List<AttractionInformationDto> getNearByAttractions(VisitedLocation visitedLocation, User user) {
+	    List<Attraction> allAttractions = gpsUtil.getAttractions();
+	    return allAttractions.stream()
+	        // Trier les attractions du plus proche au plus éloigné
+	        .sorted(Comparator.comparingDouble(attraction -> rewardsService.getDistance(attraction, visitedLocation.location)))
+	        .map(attraction -> new AttractionInformationDto(
+	            attraction.attractionName,
+	            attraction.latitude,
+	            attraction.longitude,
+	            visitedLocation.location.latitude,
+	            visitedLocation.location.longitude,
+	            rewardsService.getDistance(attraction, visitedLocation.location),
+	            rewardsService.getRewardPoints(attraction, user))) // Utilisez votre méthode getRewardPoints
+	        // Prendre les 5 premières attractions
+	        .limit(5)
+	        // Convertir le flux en liste
+	        .collect(Collectors.toList());
+	} */
+	
+	/* 1 public List<AttractionInformationDto> getNearByAttractions(VisitedLocation visitedLocation, User user) {
+	    List<Attraction> allAttractions = gpsUtil.getAttractions();
+
+	    // Utiliser une TreeMap pour trier automatiquement les attractions par distance
+	    TreeMap<Double, Attraction> sortedAttractions = new TreeMap<>();
+	    for (Attraction attraction : allAttractions) {
+	        double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+	        sortedAttractions.put(distance, attraction);
+	    }
+
+	    List<AttractionInformationDto> nearestAttractions = new ArrayList<>();
+	    int count = 0;
+	    for (Map.Entry<Double, Attraction> entry : sortedAttractions.entrySet()) {
+	        if (count >= 5) break; // Limite aux 5 attractions les plus proches
+
+	        Attraction attraction = entry.getValue();
+	        AttractionInformationDto dto = new AttractionInformationDto(
+	            attraction.attractionName,
+	            attraction.latitude,
+	            attraction.longitude,
+	            visitedLocation.location.latitude,
+	            visitedLocation.location.longitude,
+	            entry.getKey(), // La distance est déjà calculée
+	            rewardsService.getRewardPoints(attraction, user)
+	        );
+	        nearestAttractions.add(dto);
+	        count++;
+	    }
+
+	    return nearestAttractions;
+	}
+
+
+*/
+	/*
+	public List<AttractionInformationDto> getNearByAttractions(VisitedLocation visitedLocation, User user) {
+	    return gpsUtil.getAttractions().stream()
+	        .map(attraction -> createAttractionInformationDto(attraction, visitedLocation, user))
+	        .sorted(Comparator.comparing(AttractionInformationDto::getDistance))
+	        .limit(5)
+	        .collect(Collectors.toList());
+	} */
 	
 	public List<AttractionInformationDto> getNearByAttractions(VisitedLocation visitedLocation, User user) {
 	    // Obtenez toutes les attractions et calculez leur distance à l'utilisateur
@@ -264,7 +372,7 @@ public class TourGuideService {
 	    logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}
 
-
+    //y avait un point d'arret 
 	private void generateUserLocationHistory(User user) {
 		IntStream.range(0, 3).forEach(i -> {
 			user.addToVisitedLocations(new VisitedLocation(user.getUserId(),
