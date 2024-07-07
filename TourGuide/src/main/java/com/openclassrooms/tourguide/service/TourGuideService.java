@@ -147,6 +147,16 @@ public class TourGuideService {
 	    return CompletableFuture.runAsync(() -> trackUserLocation(user), executorService);
 	}
 
+	////
+	public CompletableFuture<VisitedLocation> trackUserLocationA(User user) {
+	    return CompletableFuture.supplyAsync(() -> {
+	        VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+	        user.addToVisitedLocations(visitedLocation);
+	        rewardsService.calculateRewards(user);
+	        return visitedLocation;
+	    });
+	}
+
 
 
 	/*

@@ -33,6 +33,7 @@ public class TestPerformance {
 	 * InternalTestHelper.setInternalUserNumber(100000);
 	 * 
 	 * 
+	 * 
 	 * These tests can be modified to suit new solutions, just as long as the
 	 * performance metrics at the end of the tests remains consistent.
 	 * 
@@ -74,6 +75,7 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	} */
 	//@Disabled
+	/*
 	@Test
 	public void highVolumeTrackLocation() {
 	    GpsUtil gpsUtil = new GpsUtil();
@@ -99,7 +101,39 @@ public class TestPerformance {
 	            TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
 	    assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
+       */
+	
+	@Test
+	public void highVolumeTrackLocation() {
+	    GpsUtil gpsUtil = new GpsUtil();
+	    RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+	    InternalTestHelper.setInternalUserNumber(10000);
+	    TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
+	    List<User> allUsers = tourGuideService.getAllUsers();
+
+	    StopWatch stopWatch = new StopWatch();
+	    stopWatch.start();
+
+	    
+	    List<CompletableFuture<VisitedLocation>> locationFutures = allUsers.stream()
+	        .map(tourGuideService::trackUserLocationA)
+	        .collect(Collectors.toList());
+
+	    
+	    CompletableFuture<Void> allFutures = CompletableFuture.allOf(locationFutures.toArray(new CompletableFuture[0]));
+	    allFutures.join();
+
+	    stopWatch.stop();
+	    tourGuideService.tracker.stopTracking();
+
+	    System.out.println("highVolumeTrackLocation: Time Elapsed: " +
+	            TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
+	    assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
+	}
+
+ 
+           
 
 	//
 	
