@@ -25,8 +25,14 @@ jobs:
           mvn install:install-file -Dfile=TourGuide/libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
           mvn install:install-file -Dfile=TourGuide/libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
           
-      - name: Build with Maven
-        run: mvn clean install # L'option -B est pour le mode batch (non interactif)
+      - name: Compile with Maven
+        run: mvn compile -B
+      
+      - name: Test with Maven
+        run: mvn test -B
+      
+      - name: Package with Maven
+        run: mvn package -DskipTests=true -B
       
       - name: Upload JAR
         uses: actions/upload-artifact@v2
