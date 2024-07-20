@@ -26,17 +26,16 @@ jobs:
           mvn install:install-file -Dfile=TourGuide/libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
           
       - name: Compile with Maven
-        run: mvn compile 
+        run: mvn compile -B
       
       - name: Test with Maven
-        run: mvn test 
+        run: mvn test -B
       
       - name: Package with Maven
-        run: mvn package -DskipTests=true 
+        run: mvn package -DskipTests=true -B
       
       - name: Upload JAR
         uses: actions/upload-artifact@v2
         with:
           name: app-jar
           path: tourguide/target/*.jar
-
