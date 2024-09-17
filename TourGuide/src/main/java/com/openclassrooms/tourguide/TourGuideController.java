@@ -49,17 +49,6 @@ public class TourGuideController {
     	return tourGuideService.getNearByAttractions(visitedLocation);
     }*/
     
-   /* @RequestMapping("/getNearbyAttractions")
-    public List<AttractionInformationDto> getNearbyAttractions(@RequestParam String userName) {
-        User user = tourGuideService.getUser(userName);
-        if (user == null) {
-            // Gérer le cas où l'utilisateur n'existe pas
-            return Collections.emptyList();
-        }
-        VisitedLocation visitedLocation = tourGuideService.getUserLocation(user);
-        return tourGuideService.getNearByAttractions(visitedLocation, user);
-    }*/
-    
     @RequestMapping("/getNearbyAttractions") 
     public List<AttractionInformationDto> getNearbyAttractions(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
