@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: app-jar
-          path: tourguide/target/*.jar
+          path: TourGuide/target/*.jar
