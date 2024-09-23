@@ -1,6 +1,7 @@
 # Technologies
 
-> Java 17  
+> Java 17
+
 > Spring Boot 3.1.1
 
 > JUnit 5  
