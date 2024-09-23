@@ -2,6 +2,7 @@
 
 > Java 17  
 > Spring Boot 3.1.1
+> 
 > JUnit 5  
 
 # Comment rendre disponibles les dépendances gpsUtil, rewardCentral et tripPricer ?
